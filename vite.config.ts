@@ -8,6 +8,7 @@ declare module "@remix-run/node" {
   }
 }
 
+// User's custom Vite configuration for Remix
 export default defineConfig({
   plugins: [
     remix({
@@ -21,4 +22,11 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  build: {
+    sourcemap: true,
+    minify: 'esbuild',
+  },
+  server: {
+    port: 3000,
+  },
 });
