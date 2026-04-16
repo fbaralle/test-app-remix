@@ -8,6 +8,7 @@ import {
 import type { LinksFunction } from "@remix-run/node";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import HealthcheckToolbar from "~/components/HealthcheckToolbar";
 
 import stylesheet from "~/tailwind.css?url";
 
@@ -42,8 +43,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
         <title>Webflow Cloud Test App</title>
       </head>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col pb-12">
         {children}
+        <HealthcheckToolbar />
         <ScrollRestoration />
         <Scripts />
       </body>

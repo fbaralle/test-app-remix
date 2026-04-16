@@ -24,3 +24,6 @@ build
 logs
 *.log
 npm-debug.log*
+
+# Cloudflare
+.wrangler
