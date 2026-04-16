@@ -8,10 +8,15 @@ declare module "@remix-run/node" {
   }
 }
 
+// Get base path from COSMIC_MOUNT_PATH environment variable
+const basePath = process.env.COSMIC_MOUNT_PATH || "/";
+
 // User's custom Vite configuration for Remix
 export default defineConfig({
+  base: basePath,
   plugins: [
     remix({
+      basename: basePath,
       future: {
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,

@@ -1,5 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import CryptoDashboard from "~/components/CryptoDashboard";
+import FavoritesSection from "~/components/FavoritesSection";
 
 export const meta: MetaFunction = () => {
   return [
@@ -23,6 +24,7 @@ export default function Index() {
         </p>
       </header>
       <main className="flex-1 px-4 pb-12">
+        <FavoritesSection />
         <CryptoDashboard />
       </main>
       <footer className="border-t border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-900/60 backdrop-blur">

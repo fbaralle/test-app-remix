@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Coin {
@@ -29,6 +29,55 @@ interface ApiError {
   label: string;
   code: string;
   detail: string;
+}
+
+interface Favorite {
+  id: number;
+  user_id: string;
+  coin_id: string;
+  coin_name: string | null;
+  coin_symbol: string | null;
+  coin_image: string | null;
+  created_at: number;
+}
+
+interface FavoritesResponse {
+  favorites: Favorite[];
+  error?: string;
+}
+
+async function fetchFavorites(): Promise<FavoritesResponse> {
+  const res = await fetch("/api/favorites?user_id=public");
+  if (!res.ok) {
+    throw new Error("Failed to fetch favorites");
+  }
+  return res.json();
+}
+
+async function addFavorite(coin: Coin): Promise<void> {
+  const res = await fetch("/api/favorites", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: "public",
+      coin_id: coin.id,
+      coin_name: coin.name,
+      coin_symbol: coin.symbol,
+      coin_image: coin.image,
+    }),
+  });
+  if (!res.ok) {
+    throw new Error("Failed to add favorite");
+  }
+}
+
+async function removeFavorite(coinId: string): Promise<void> {
+  const res = await fetch(`/api/favorites?user_id=public&coin_id=${coinId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to remove favorite");
+  }
 }
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
@@ -183,6 +232,7 @@ function PriceBar({
 }
 
 export default function CryptoDashboard() {
+  const queryClient = useQueryClient();
   const [toasts, setToasts] = useState<
     { id: number; label: string; code: string; detail: string; type: "error" | "info" }[]
   >([]);
@@ -195,6 +245,37 @@ export default function CryptoDashboard() {
   const [refreshInterval, setRefreshInterval] = useState(30);
   const [countdown, setCountdown] = useState(0);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Favorites query and mutations
+  const { data: favoritesData } = useQuery({
+    queryKey: ["favorites"],
+    queryFn: fetchFavorites,
+  });
+
+  const favoriteIds = new Set(favoritesData?.favorites?.map((f) => f.coin_id) ?? []);
+
+  const addFavoriteMutation = useMutation({
+    mutationFn: addFavorite,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
+
+  const removeFavoriteMutation = useMutation({
+    mutationFn: removeFavorite,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
+
+  const toggleFavorite = useCallback((coin: Coin, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (favoriteIds.has(coin.id)) {
+      removeFavoriteMutation.mutate(coin.id);
+    } else {
+      addFavoriteMutation.mutate(coin);
+    }
+  }, [favoriteIds, addFavoriteMutation, removeFavoriteMutation]);
 
   const addToast = useCallback(
     (toast: { label: string; code: string; detail: string; type?: "error" | "info" }) => {
@@ -428,6 +509,7 @@ export default function CryptoDashboard() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-left">
+                <th className="px-2 py-3 font-medium text-center w-10"></th>
                 <th
                   className="px-4 py-3 font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white whitespace-nowrap"
                   onClick={() => handleSort("market_cap_rank")}
@@ -477,7 +559,7 @@ export default function CryptoDashboard() {
                       key={i}
                       className="border-t border-gray-100 dark:border-gray-800 animate-pulse"
                     >
-                      <td className="px-4 py-4" colSpan={8}>
+                      <td className="px-4 py-4" colSpan={9}>
                         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
                       </td>
                     </tr>
@@ -496,6 +578,24 @@ export default function CryptoDashboard() {
                           : "hover:bg-gray-50 dark:hover:bg-gray-800/50"
                       }`}
                     >
+                      <td className="px-2 py-3 text-center">
+                        <button
+                          onClick={(e) => toggleFavorite(coin, e)}
+                          disabled={addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
+                          className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
+                          aria-label={favoriteIds.has(coin.id) ? `Remove ${coin.name} from favorites` : `Add ${coin.name} to favorites`}
+                        >
+                          <svg
+                            className={`w-5 h-5 ${favoriteIds.has(coin.id) ? "text-yellow-500" : "text-gray-300 dark:text-gray-600"}`}
+                            fill={favoriteIds.has(coin.id) ? "currentColor" : "none"}
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </button>
+                      </td>
                       <td className="px-4 py-3 text-gray-500 dark:text-gray-400 font-mono">
                         {coin.market_cap_rank}
                       </td>
