@@ -7,8 +7,7 @@
     {
       "binding": "DB",
       "database_name": "project-updates-db",
-      "database_id": "local",
-      "migrations_dir": "drizzle"
+      "database_id": "local"
     }
   ],
   "kv_namespaces": [
