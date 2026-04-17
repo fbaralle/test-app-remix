@@ -11,12 +11,20 @@ interface Favorite {
 }
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
-  const { env } = context.cloudflare;
-  const url = new URL(request.url);
-  const userId = url.searchParams.get("user_id") || "public";
-
   try {
-    const { results } = await env.DB.prepare(
+    const db = context.cloudflare?.env?.DB as D1Database | undefined;
+
+    if (!db) {
+      return Response.json(
+        { error: "DB D1 binding not available", favorites: [] },
+        { status: 503 }
+      );
+    }
+
+    const url = new URL(request.url);
+    const userId = url.searchParams.get("user_id") || "public";
+
+    const { results } = await db.prepare(
       "SELECT * FROM favorites WHERE user_id = ? ORDER BY created_at DESC"
     )
       .bind(userId)
@@ -32,11 +40,19 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 }
 
 export async function action({ context, request }: ActionFunctionArgs) {
-  const { env } = context.cloudflare;
   const method = request.method;
 
   if (method === "POST") {
     try {
+      const db = context.cloudflare?.env?.DB as D1Database | undefined;
+
+      if (!db) {
+        return Response.json(
+          { error: "DB D1 binding not available" },
+          { status: 503 }
+        );
+      }
+
       const body = await request.json();
       const {
         user_id = "public",
@@ -56,7 +72,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         return Response.json({ error: "coin_id is required" }, { status: 400 });
       }
 
-      await env.DB.prepare(
+      await db.prepare(
         "INSERT OR IGNORE INTO favorites (user_id, coin_id, coin_name, coin_symbol, coin_image, created_at) VALUES (?, ?, ?, ?, ?, ?)"
       )
         .bind(user_id, coin_id, coin_name || null, coin_symbol || null, coin_image || null, Date.now())
@@ -72,16 +88,25 @@ export async function action({ context, request }: ActionFunctionArgs) {
   }
 
   if (method === "DELETE") {
-    const url = new URL(request.url);
-    const userId = url.searchParams.get("user_id") || "public";
-    const coinId = url.searchParams.get("coin_id");
-
-    if (!coinId) {
-      return Response.json({ error: "coin_id is required" }, { status: 400 });
-    }
-
     try {
-      await env.DB.prepare(
+      const db = context.cloudflare?.env?.DB as D1Database | undefined;
+
+      if (!db) {
+        return Response.json(
+          { error: "DB D1 binding not available" },
+          { status: 503 }
+        );
+      }
+
+      const url = new URL(request.url);
+      const userId = url.searchParams.get("user_id") || "public";
+      const coinId = url.searchParams.get("coin_id");
+
+      if (!coinId) {
+        return Response.json({ error: "coin_id is required" }, { status: 400 });
+      }
+
+      await db.prepare(
         "DELETE FROM favorites WHERE user_id = ? AND coin_id = ?"
       )
         .bind(userId, coinId)

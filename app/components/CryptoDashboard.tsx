@@ -250,12 +250,14 @@ export default function CryptoDashboard() {
   const { data: favoritesData } = useQuery({
     queryKey: ["favorites"],
     queryFn: fetchFavorites,
+    retry: false,
   });
 
   const favoriteIds = new Set(favoritesData?.favorites?.map((f) => f.coin_id) ?? []);
 
   const addFavoriteMutation = useMutation({
     mutationFn: addFavorite,
+    retry: false,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
@@ -263,6 +265,7 @@ export default function CryptoDashboard() {
 
   const removeFavoriteMutation = useMutation({
     mutationFn: removeFavorite,
+    retry: false,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
@@ -301,6 +304,7 @@ export default function CryptoDashboard() {
     queryKey: ["coins", currency],
     queryFn: () => fetchCoins(currency),
     refetchInterval: autoRefresh ? refreshInterval * 1000 : false,
+    retry: false,
   });
 
   // Show toast when query errors

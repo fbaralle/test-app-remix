@@ -32,6 +32,15 @@ async function removeFavorite(coinId: string): Promise<void> {
   }
 }
 
+export function useFavorites() {
+  const { data } = useQuery({
+    queryKey: ["favorites"],
+    queryFn: fetchFavorites,
+    retry: false,
+  });
+  return { data: data?.favorites };
+}
+
 export default function FavoritesSection() {
   const queryClient = useQueryClient();
 
@@ -42,10 +51,12 @@ export default function FavoritesSection() {
   } = useQuery({
     queryKey: ["favorites"],
     queryFn: fetchFavorites,
+    retry: false,
   });
 
   const removeMutation = useMutation({
     mutationFn: removeFavorite,
+    retry: false,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
