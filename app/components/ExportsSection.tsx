@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFavorites } from "./FavoritesSection";
 
-const basePath = import.meta.env.VITE_API_MOUNT_PATH || "";
+const basePath = import.meta.env.PUBLIC_API_MOUNT_PATH || "";
 
 interface Export {
   key: string;

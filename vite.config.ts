@@ -15,7 +15,7 @@ const basePath = process.env.COSMIC_MOUNT_PATH || "/";
 export default defineConfig({
   base: basePath,
   define: {
-    'import.meta.env.VITE_API_MOUNT_PATH': JSON.stringify(basePath === "/" ? "" : basePath),
+    'import.meta.env.PUBLIC_API_MOUNT_PATH': JSON.stringify(process.env.PUBLIC_API_MOUNT_PATH || '')
   },
   plugins: [
     remix({
