@@ -222,7 +222,7 @@ export default function HealthcheckToolbar() {
   useEffect(() => {
     async function fetchHealth() {
       try {
-        const res = await fetch(`${basePath}/api/healthcheck`);
+        const res = await fetch(`${basePath}/api/binding-status`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = (await res.json()) as HealthcheckResponse;
         setHealth(data);
