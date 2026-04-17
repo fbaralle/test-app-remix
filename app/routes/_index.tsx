@@ -4,6 +4,7 @@ import FavoritesSection from "~/components/FavoritesSection";
 import PageViewsSection from "~/components/PageViewsSection";
 import FeatureFlagsSection from "~/components/FeatureFlagsSection";
 import ExportsSection from "~/components/ExportsSection";
+import EnvDebugSection from "~/components/EnvDebugSection";
 
 export const meta: MetaFunction = () => {
   return [
@@ -29,10 +30,11 @@ export default function Index() {
       <main className="flex-1 px-4 pb-12">
         <FavoritesSection />
         <CryptoDashboard />
-        <div className="w-full max-w-6xl mx-auto mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="w-full max-w-6xl mx-auto mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
           <PageViewsSection compact />
           <FeatureFlagsSection compact />
           <ExportsSection compact />
+          <EnvDebugSection compact />
         </div>
       </main>
       <footer className="border-t border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-900/60 backdrop-blur">
