@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const basePath = import.meta.env.PUBLIC_API_MOUNT_PATH || "";
+const basePath = import.meta.env.APP_PUBLIC_API_PATH || "";
 
 interface ServiceStatus {
   status: "ok" | "error";

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-const basePath = import.meta.env.PUBLIC_API_MOUNT_PATH || "";
+const basePath = import.meta.env.APP_PUBLIC_API_PATH || "";
 
 interface Favorite {
   id: number;
