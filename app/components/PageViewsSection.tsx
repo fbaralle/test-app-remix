@@ -18,6 +18,7 @@ interface TrackResponse {
 }
 
 const VISITOR_ID_KEY = "crypto_dashboard_visitor_id";
+const basePath = import.meta.env.VITE_API_MOUNT_PATH || "";
 
 function getVisitorId(): string | null {
   if (typeof window === "undefined") return null;
@@ -30,7 +31,7 @@ function setVisitorId(id: string): void {
 }
 
 async function fetchPageViews(): Promise<PageViewsData> {
-  const res = await fetch("/api/pageviews");
+  const res = await fetch(`${basePath}/api/pageviews`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = (await res.json()) as PageViewsResponse;
   if (data.error) throw new Error(data.error);
@@ -38,7 +39,7 @@ async function fetchPageViews(): Promise<PageViewsData> {
 }
 
 async function trackPageView(visitorId: string | null): Promise<TrackResponse> {
-  const res = await fetch("/api/pageviews", {
+  const res = await fetch(`${basePath}/api/pageviews`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ visitorId }),

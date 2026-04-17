@@ -14,6 +14,9 @@ const basePath = process.env.COSMIC_MOUNT_PATH || "/";
 // User's custom Vite configuration for Remix
 export default defineConfig({
   base: basePath,
+  define: {
+    'import.meta.env.VITE_API_MOUNT_PATH': JSON.stringify(basePath === "/" ? "" : basePath),
+  },
   plugins: [
     remix({
       basename: basePath,

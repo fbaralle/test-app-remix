@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+const basePath = import.meta.env.VITE_API_MOUNT_PATH || "";
+
 interface Favorite {
   id: number;
   user_id: string;
@@ -16,7 +18,7 @@ interface FavoritesResponse {
 }
 
 async function fetchFavorites(): Promise<FavoritesResponse> {
-  const res = await fetch("/api/favorites?user_id=public");
+  const res = await fetch(`${basePath}/api/favorites?user_id=public`);
   if (!res.ok) {
     throw new Error("Failed to fetch favorites");
   }
@@ -24,7 +26,7 @@ async function fetchFavorites(): Promise<FavoritesResponse> {
 }
 
 async function removeFavorite(coinId: string): Promise<void> {
-  const res = await fetch(`/api/favorites?user_id=public&coin_id=${coinId}`, {
+  const res = await fetch(`${basePath}/api/favorites?user_id=public&coin_id=${coinId}`, {
     method: "DELETE",
   });
   if (!res.ok) {

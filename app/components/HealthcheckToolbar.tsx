@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const basePath = import.meta.env.VITE_API_MOUNT_PATH || "";
+
 interface ServiceStatus {
   status: "ok" | "error";
   latency: number;
@@ -220,7 +222,7 @@ export default function HealthcheckToolbar() {
   useEffect(() => {
     async function fetchHealth() {
       try {
-        const res = await fetch("/api/healthcheck");
+        const res = await fetch(`${basePath}/api/healthcheck`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = (await res.json()) as HealthcheckResponse;
         setHealth(data);
