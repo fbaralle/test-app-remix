@@ -9,7 +9,7 @@ interface FlagsResponse {
   error?: string;
 }
 
-const basePath = import.meta.env.APP_PUBLIC_API_PATH || "";
+const basePath = (import.meta.env.BASE_URL || "").replace(/\/$/, "");
 
 const FLAG_LABELS: Record<string, { label: string; description: string }> = {
   dark_mode: { label: "Dark Mode", description: "Enable dark color scheme" },
