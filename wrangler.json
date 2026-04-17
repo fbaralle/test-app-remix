@@ -6,8 +6,9 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "project-updates-db",
-      "database_id": "local"
+      "database_name": "db",
+      "database_id": "0",
+      "migrations_dir": "drizzle"
     }
   ],
   "kv_namespaces": [
@@ -15,6 +16,6 @@
     { "binding": "FLAGS", "id": "local-flags" }
   ],
   "r2_buckets": [
-    { "binding": "WEBFLOW_CLOUD_MEDIA", "bucket_name": "fake" }
+    { "binding": "MEDIA", "bucket_name": "media" }
   ]
 }

@@ -6,7 +6,7 @@ interface CloudflareEnv {
   DB: D1Database;
   SESSIONS: KVNamespace;
   FLAGS: KVNamespace;
-  WEBFLOW_CLOUD_MEDIA: R2Bucket;
+  MEDIA: R2Bucket;
 }
 
 type Cloudflare = Omit<PlatformProxy<CloudflareEnv>, "dispose">;

@@ -66,7 +66,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
     checkD1(env.DB),
     checkKV(env.SESSIONS),
     checkKV(env.FLAGS),
-    checkR2(env.WEBFLOW_CLOUD_MEDIA),
+    checkR2(env.MEDIA),
   ]);
 
   const services = { d1, kv_sessions, kv_flags, r2 };
