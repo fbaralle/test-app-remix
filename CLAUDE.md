@@ -33,6 +33,17 @@ A change meant for `main` goes to `main` in all 9 repos; a change meant for `clo
 - **Don't re-add this as a monorepo.** Each repo ships independently to its own GitHub remote for Webflow Cloud deployment. The shared parent folder is local convenience only.
 - **Don't change pinned versions or build quirks casually.** Items like Astro 6's `overrides.vite`, Remix's React 18 pin, and the Tailwind v3/v4 split are intentional — see `CONTEXT.md`.
 
+## Build health contract
+
+Every app must work with a **clean, flag-free** npm flow on each branch:
+
+- `npm install` — no `--legacy-peer-deps`, no `--force` flags. If an upstream peer-dep conflict makes that impossible (e.g. Remix 2's stale `wrangler` peer), bake the workaround into the repo (`.npmrc` with `legacy-peer-deps=true`) so `npm install` still works out of the box.
+- `npm run dev` — starts the dev server.
+- `npm run build` — produces a successful production build.
+- `npm run dev:cf` (on `cloudflare-bindings` branch only) — runs the build + `wrangler pages dev` flow locally against the bindings.
+
+A change that breaks any of these on any repo is not done. Before declaring a cross-repo change complete, verify at minimum `npm install` and `npm run build` on every affected repo/branch.
+
 ## Verifying changes
 
-After a cross-repo change: build each affected app (`npm run build`) to confirm the builder still succeeds everywhere. That's the whole point of this test harness.
+After a cross-repo change: run the build-health contract above on each affected app. That's the whole point of this test harness — if the vanilla npm flow doesn't work, the Webflow Cloud builder's test signal is meaningless.

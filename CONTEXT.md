@@ -35,6 +35,7 @@ Both branches exist on all 9 repos and must be kept in cross-framework parity: a
 - Astro 6 has `"overrides": { "vite": "^7" }` to fix Vite 8 compatibility
 - Astro 6 requires Node 22+ (has .nvmrc file)
 - Remix uses React 18 due to @remix-run/react peer dependency
+- Remix on `cloudflare-bindings` ships a `.npmrc` with `legacy-peer-deps=true` because `@remix-run/dev@2.x` declares a stale `peerOptional wrangler@^3` that conflicts with the wrangler v4 used by the bindings
 
 ## Running Locally
 
@@ -44,6 +45,13 @@ cd {project}
 npm install
 npm run dev
 ```
+
+Every app is expected to work with a **clean, flag-free** npm flow:
+
+- `npm install` (no `--legacy-peer-deps` or `--force` at the command line — if a workaround is needed, bake it into `.npmrc`)
+- `npm run dev`
+- `npm run build`
+- `npm run dev:cf` on the `cloudflare-bindings` branch
 
 Note: Astro 6 requires Node 22+. Use `nvm use` if you have the correct version installed.
 
