@@ -16,21 +16,13 @@ const handleRemixRequest = createRequestHandler(build as unknown as ServerBuild)
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    // Webflow Cloud mounts the app at a path prefix (e.g. /remix-cf). Remix's
-    // basename is baked in at build time via COSMIC_MOUNT_PATH, but API routes
-    // are matched on the full path. Strip the prefix so /<prefix>/api/... maps
-    // to /api/... regardless of where the app is mounted.
-    const url = new URL(request.url);
-    const apiIndex = url.pathname.indexOf("/api/");
-    const isApi = apiIndex !== -1;
-    if (isApi && apiIndex > 0) {
-      url.pathname = url.pathname.slice(apiIndex);
-      request = new Request(url.toString(), request);
-    }
-
     // Route API paths straight to Remix. Passing through env.ASSETS would
     // consume the request body (ReadableStream is disturbed), breaking POST
-    // actions. Static assets can't live under /api/* anyway.
+    // actions. Static assets can't live under /api/* anyway. The URL is
+    // passed through untouched so Remix's configured basename (set from
+    // COSMIC_MOUNT_PATH at build time) can match prefixed routes.
+    const url = new URL(request.url);
+    const isApi = url.pathname.includes("/api/");
     if (!isApi) {
       const asset = await env.ASSETS.fetch(request);
       if (asset.status !== 404) return asset;
