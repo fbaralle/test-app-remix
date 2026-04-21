@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "test-app-remix",
+  "pages_build_output_dir": "./build/client",
   "compatibility_date": "2025-04-15",
   "compatibility_flags": ["nodejs_compat"],
   "d1_databases": [
