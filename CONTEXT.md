@@ -19,6 +19,15 @@ Each framework lives in its own repository. Locally they are grouped under `webf
 | `test-app-svelte` | Vite + Svelte 5 | Svelte runes ($state, $effect) |
 | `test-app-sveltekit` | SvelteKit 2 + Svelte 5 | Svelte Query |
 
+## Branches
+
+Each repo has two long-lived branches, both important for testing:
+
+- **`main`** — the vanilla project as it comes out of the box (e.g. `npx create-next-app` for Next.js, the equivalent CLI for each framework). Untouched baseline. The Webflow Cloud app builder should handle this with no Cloudflare-specific config.
+- **`cloudflare-bindings`** — adds the config files and libraries needed to provision and bind Cloudflare resources (D1, R2, KV) to the app on deploy. When the builder runs this branch, deployment should create those services in Cloudflare and wire them into the app.
+
+Both branches exist on all 9 repos and must be kept in cross-framework parity: a change intended for `main` goes to `main` in all 9; a change intended for `cloudflare-bindings` goes to `cloudflare-bindings` in all 9. Never cross-contaminate — `cloudflare-bindings`-only files (wrangler config, binding clients, etc.) must not leak into `main`.
+
 ## Key Technical Details
 
 - All apps use TanStack Query (React/Vue/Svelte variants)

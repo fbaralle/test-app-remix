@@ -8,6 +8,15 @@ Any user-visible change (feature, UI, data shape, routing behavior, build config
 
 Sibling repos live at `../test-app-{framework}` locally (under `webflow-org/test-apps/`). Each has its own remote — changes must be committed and pushed per-repo.
 
+## Branches
+
+Every repo has two long-lived branches, and **parity applies per-branch**:
+
+- **`main`** — vanilla framework output (`npx create-next-app` or equivalent). The clean baseline.
+- **`cloudflare-bindings`** — adds wrangler config, binding libs, and glue for Cloudflare D1 / R2 / KV, so Webflow Cloud provisions those resources on deploy.
+
+A change meant for `main` goes to `main` in all 9 repos; a change meant for `cloudflare-bindings` goes to `cloudflare-bindings` in all 9. Never leak `cloudflare-bindings`-only files into `main`. When unsure which branch a change belongs on, ask.
+
 ## Before making changes
 
 1. **Ask scope first.** If the user requests a change in one repo, confirm whether it should propagate to the other 8 — unless they've already said so. Don't silently apply across all repos.
