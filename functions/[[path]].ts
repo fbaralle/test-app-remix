@@ -8,16 +8,23 @@ const remixHandler = createPagesFunctionHandler({ build });
 // Webflow Cloud mounts the app at a path prefix (e.g. /vite-remix-cf).
 // The Remix basename is set from process.env.COSMIC_MOUNT_PATH at build
 // time; if that env var is not available when the builder runs, Remix
-// builds with basename "/" and will not match prefixed URLs. This
-// wrapper strips everything before /api/ so API routes resolve even
-// when the mount prefix was not baked into the build.
+// builds with basename "/" and will not match prefixed URLs. When a
+// prefix is present we swap the request URL in place so Remix matches
+// /api/* routes — crucially we mutate `context.request` rather than
+// spreading into a new object, because spreading has been observed to
+// drop the Pages binding env in deployment (bindings came back as
+// undefined on `context.env.DB` etc).
 export const onRequest: PagesFunction = (context) => {
   const url = new URL(context.request.url);
   const apiIndex = url.pathname.indexOf("/api/");
   if (apiIndex > 0) {
     url.pathname = url.pathname.slice(apiIndex);
     const rewrittenRequest = new Request(url.toString(), context.request);
-    return remixHandler({ ...context, request: rewrittenRequest });
+    Object.defineProperty(context, "request", {
+      value: rewrittenRequest,
+      writable: true,
+      configurable: true,
+    });
   }
   return remixHandler(context);
 };
