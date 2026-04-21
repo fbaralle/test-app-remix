@@ -22,14 +22,19 @@ export default {
     // to /api/... regardless of where the app is mounted.
     const url = new URL(request.url);
     const apiIndex = url.pathname.indexOf("/api/");
-    if (apiIndex > 0) {
+    const isApi = apiIndex !== -1;
+    if (isApi && apiIndex > 0) {
       url.pathname = url.pathname.slice(apiIndex);
       request = new Request(url.toString(), request);
     }
 
-    // Serve static assets first; fall through to Remix for SSR routes.
-    const asset = await env.ASSETS.fetch(request);
-    if (asset.status !== 404) return asset;
+    // Route API paths straight to Remix. Passing through env.ASSETS would
+    // consume the request body (ReadableStream is disturbed), breaking POST
+    // actions. Static assets can't live under /api/* anyway.
+    if (!isApi) {
+      const asset = await env.ASSETS.fetch(request);
+      if (asset.status !== 404) return asset;
+    }
 
     return handleRemixRequest(request, {
       cloudflare: { env, ctx },
